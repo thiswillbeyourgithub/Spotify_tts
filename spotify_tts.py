@@ -4,7 +4,6 @@ import subprocess
 import time
 import os
 import sys
-import time
 from pathlib import Path
 
 # USER SETTINGS: ###############################
@@ -56,7 +55,8 @@ while True:
         for line in current_metadata:
             if "xesam:title " in line:
                 title = line.split("xesam:title")[1]
-                title = title.strip().replace(".", "").replace(",", "")[0:title_max_length]
+                title = title.strip().replace(".", "").replace(",", "")
+                title = title[0:title_max_length]
                 if title == previous_song:
                     to_read_flag = False
                 else:
