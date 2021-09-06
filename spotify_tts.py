@@ -8,7 +8,7 @@ from pathlib import Path
 
 # USER SETTINGS: ###############################
 High_quality_speech = True  # True for AI powered TTS, False to use espeak
-rate = 24000  # default to 24000, changes the playback speed
+rate = 22000  # default to 24000, changes the playback speed
 step = 95000  # step of the model used, changing the value requires downloading
 # a different model each time
 title_max_length = 50
@@ -57,6 +57,9 @@ while True:
                 title = line.split("xesam:title")[1]
                 title = title.strip().replace(".", "").replace(",", "")
                 title = title[0:title_max_length]
+                if "featuring" not in title:
+                    title = title.replace("feat", "featuring")
+
                 if title == previous_song:
                     to_read_flag = False
                 else:
