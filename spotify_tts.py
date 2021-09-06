@@ -68,17 +68,18 @@ while True:
                     artist = artist[0:title_max_length]
         if to_read_flag is True:
             print(f"Playing: {title} by {artist}")
+            run_shell_cmd("playerctl --player spotify pause")
+
             if High_quality_speech is False:
-                run_shell_cmd("playerctl --player spotify pause")
                 os.system(f"{espeak_cmd} '{title}, by {artist}'")
             else:
                 out = model.predict(f"{title}, by {artist}")
                 wav = audio.reconstruct_waveform(out['mel'].numpy().T)
                 write("output.wav", data=wav, rate=rate)
-                run_shell_cmd("playerctl --player spotify pause")
                 time.sleep(0.2)
                 playsound("output.wav")
                 time.sleep(0.2)
+
             run_shell_cmd("playerctl --player spotify play")
         previous_song = title
     time.sleep(1)
