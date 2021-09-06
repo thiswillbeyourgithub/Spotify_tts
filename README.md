@@ -10,4 +10,4 @@
 * `git clone https://github.com/thiswillbeyourgithub/Spotify_tts/`
 * `cd Spotify_tts`
 * `pip3 install -r ./requirements.txt` **optionnal, only if you want to use AI powered TTS**
-* `cd Spotify_tts && python3 ./Spotify_tts.py` 
+* `cd Spotify_tts && python3 ./spotify_tts.py` 
