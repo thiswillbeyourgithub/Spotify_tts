@@ -5,6 +5,7 @@
 * Linux only, needs to have [playerctl](https://github.com/altdesktop/playerctl) installed
 * 2 modes available, either poor quality speech using `espeak`, or high quality using [TransformerTTS](https://github.com/as-ideas/TransformerTTS)
 * Contributions welcome.
+* Can be run as daemon, using `exec --no-startup-id 'start-stop-daemon --start --background -C --pidfile /tmp/spotify_tts_pid --make-pidfile --exec /Full/path/Spotify_tts/spotify_tts.py -d /Full/path/TransformerTTS`
 
 # Usage:
 * `git clone https://github.com/thiswillbeyourgithub/Spotify_tts/`

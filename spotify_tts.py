@@ -71,9 +71,9 @@ while True:
             run_shell_cmd("playerctl --player spotify pause")
 
             if High_quality_speech is False:
-                os.system(f"{espeak_cmd} '{title}, by {artist}'")
+                os.system(f"{espeak_cmd} '{title}, by {artist}.'")
             else:
-                out = model.predict(f"{title}, by {artist}")
+                out = model.predict(f"{title}, by {artist}.")
                 wav = audio.reconstruct_waveform(out['mel'].numpy().T)
                 write("output.wav", data=wav, rate=rate)
                 time.sleep(0.2)
