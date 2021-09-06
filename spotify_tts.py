@@ -1,56 +1,84 @@
 #!/usr/bin/env python3
 
-
-
-# this simple unix-only scripts is launched at boot and reads the name of the song playing
-# works only on unix
-# needs to have installed playerctl
-
 import subprocess
 import time
 import os
 import sys
+import time
+from pathlib import Path
+
+# USER SETTINGS: ###############################
+High_quality_speech = True  # True for AI powered TTS, False to use espeak
+rate = 24000  # default to 24000, changes the playback speed
+step = 95000  # step of the model used, changing the value requires downloading
+# a different model each time
+title_max_length = 50
+espeak_args = "-v en -a85 -k20 -p60 -s150 --punct=''"
+##################################################
 
 
+if High_quality_speech is True:
+    if not Path("../TransformerTTS").exists():
+        print("TransformerTTS not found, downloading it using git:\n\n")
+        os.chdir("..")
+        os.system("git clone https://github.com/as-ideas/TransformerTTS")
+    tts_dir = "/".join(os.getcwd().split("/")[0:-1]) + "/TransformerTTS"
+    os.chdir(tts_dir)
+    sys.path.insert(0, tts_dir)
+    from data.audio import Audio
+    from model.factory import tts_ljspeech
+    from scipy.io.wavfile import write
+    from playsound import playsound
+    model = tts_ljspeech(step)
+    audio = Audio.from_config(model.config)
+else:
+    espeak_cmd = f"espeak {espeak_args} "
+
+# initialize some values:
+to_read_flag = False
 previous_song = ""
-read_aloud = False
-cut_limit = 50
-espeak_cmd = "espeak -v en -a85 -k20 -p60 -s150 --punct=''"
 
 
-def run_cmd(cmd):
+def run_shell_cmd(cmd):
     splitted = cmd.split(" ")
     out = subprocess.run(splitted, capture_output=True)
-    #print(out)
     return str(out.stdout)
 
 
+print("\n\nDone initializing stuff.")
 while True:
-    is_playing = run_cmd("playerctl --player spotify status")
+    is_playing = run_shell_cmd("playerctl --player spotify status")
     if "Playing" in is_playing:
-        curr_meta = run_cmd("playerctl --player spotify metadata").split("\\n")
+        current_metadata = run_shell_cmd("playerctl --player spotify metadata")
+        current_metadata = current_metadata.split("\\n")
         title = ""
         artist = ""
-        for line in curr_meta:
+        for line in current_metadata:
             if "xesam:title " in line:
                 title = line.split("xesam:title")[1]
-                title = title.strip()
-                if len(title) > cut_limit:
-                    title = title[0:cut_limit]
+                title = title.strip().replace(".", "").replace(",", "")[0:title_max_length]
                 if title == previous_song:
-                    read_aloud = False
+                    to_read_flag = False
                 else:
-                    read_aloud = True
+                    to_read_flag = True
             if "xesam:artist " in line:
                 artist = line.split("xesam:artist")[1]
-                artist = artist.strip()
-                if len(artist) > cut_limit:
-                    artist = artist[0:cut_limit]
-        if read_aloud is True:
-            run_cmd("playerctl --player spotify pause")
-            print(f"Playing {title} by {artist}")
-            os.system(f"{espeak_cmd} '{title}'")
-            os.system(f"{espeak_cmd} 'by {artist}'")
-            run_cmd("playerctl --player spotify play")
+                artist = artist.strip().replace(".", "").replace(",", "")
+                if len(artist) > title_max_length:
+                    artist = artist[0:title_max_length]
+        if to_read_flag is True:
+            print(f"Playing: {title} by {artist}")
+            if High_quality_speech is False:
+                run_shell_cmd("playerctl --player spotify pause")
+                os.system(f"{espeak_cmd} '{title}, by {artist}'")
+            else:
+                out = model.predict(f"{title}, by {artist}")
+                wav = audio.reconstruct_waveform(out['mel'].numpy().T)
+                write("output.wav", data=wav, rate=rate)
+                run_shell_cmd("playerctl --player spotify pause")
+                time.sleep(0.2)
+                playsound("output.wav")
+                time.sleep(0.2)
+            run_shell_cmd("playerctl --player spotify play")
         previous_song = title
-    time.sleep(2)
+    time.sleep(1)
