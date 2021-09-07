@@ -1,5 +1,5 @@
 # Spotify_tts
-**Reads aloud the name of the music playing on spotify using AI or espeak**
+**Daemon using TTS (text to speech) to read aloud the name of the music playing on spotify, vlc or other media players**
 
 # Main points:
 * Linux only, needs to have [playerctl](https://github.com/altdesktop/playerctl) installed
