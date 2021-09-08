@@ -67,8 +67,7 @@ def run_shell_cmd(cmd):
 
 
 print("\n\nDone initializing stuff.")
-cnt = 0
-while cnt < int(60*59):  # launched for only one hour
+while True:
     is_playing = run_shell_cmd("playerctl --player spotify status")
     if "Playing" in is_playing:
         current_metadata = run_shell_cmd("playerctl --player spotify metadata")
@@ -109,4 +108,3 @@ while cnt < int(60*59):  # launched for only one hour
             run_shell_cmd("playerctl --player spotify play")
         previous_song = title
     time.sleep(1)
-    cnt +=1
