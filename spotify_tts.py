@@ -31,8 +31,9 @@ if dcnt == 1:
 if dcnt > 1:
         print("Daemon already running. Exiting.")
         raise SystemExit()
-if cnt == 0:
+if cnt-dcnt == 0:
     print("Spotify is not running. Exiting.")
+    #os.system(f"{espeak_cmd} 'Spotify is not running'")
     raise SystemExit()
 
 
