@@ -77,6 +77,8 @@ while True:
         title = ""
         artist = ""
         for line in current_metadata:
+            if artist != "" and title != "":
+                break
             if "xesam:title " in line:
                 title = line.split("xesam:title")[1]
                 title = title.strip().replace(".", "").replace(",", "").replace("-", ",")
