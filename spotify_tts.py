@@ -59,8 +59,6 @@ if High_quality_speech is True:
     from playsound import playsound
     model = tts_ljspeech(step)
     audio = Audio.from_config(model.config)
-else:
-    espeak_cmd = f"espeak {espeak_args} "
 
 # initialize some values:
 to_read_flag = False
