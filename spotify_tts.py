@@ -13,7 +13,7 @@ rate = 22000  # default to 22000, changes the playback speed
 step = 60000  # step of the model used, changing the value requires downloading
 # a different model each time, default is 95000
 title_max_length = 50
-espeak_args = "-v en -a85 -k20 -p60 -s150 --punct=''"
+espeak_cmd = f"espeak -v en -a85 -k20 -p60 -s150 --punct=''"
 ##################################################
 
 
