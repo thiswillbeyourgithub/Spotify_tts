@@ -37,6 +37,12 @@ if cnt-dcnt == 0:
     raise SystemExit()
 
 
+def run_shell_cmd(cmd):
+    splitted = cmd.split(" ")
+    out = subprocess.run(splitted, capture_output=True)
+    return str(out.stdout)
+
+os.system(f"{espeak_cmd} 'Starting TTS'")
 
 if High_quality_speech is True:
     if not Path("../TransformerTTS").exists():
@@ -61,10 +67,7 @@ to_read_flag = False
 previous_song = ""
 
 
-def run_shell_cmd(cmd):
-    splitted = cmd.split(" ")
-    out = subprocess.run(splitted, capture_output=True)
-    return str(out.stdout)
+
 
 
 print("\n\nDone initializing stuff.")
