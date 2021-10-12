@@ -77,8 +77,11 @@ def process_text(text):
     """
     makes the title and artist more legible
     """
-    text = text.replace("b'", "").replace(r"\n'", "")
+    text = text.replace("b'", "").replace('b"', "")
+    text = text.replace("\n", "").replace("\\n", "")
+    text = text.replace("\"", "").replace("'", "")
     text = text.strip().replace(".", "").replace(",", "").replace("-", ",")
+    text = text.replace(" , ", ", ")
     text = text[0:read_max_length]
     text = str(text.encode("ascii", "ignore").decode())
     if "featuring" not in text:
