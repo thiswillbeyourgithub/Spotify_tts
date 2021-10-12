@@ -83,6 +83,7 @@ while True:
                 title = line.split("xesam:title")[1]
                 title = title.strip().replace(".", "").replace(",", "").replace("-", ",")
                 title = title[0:title_max_length]
+                title = str(title.encode("ascii", "ignore").decode())
                 if "featuring" not in title:
                     title = title.replace("feat", "featuring")
 
@@ -93,6 +94,7 @@ while True:
             if "xesam:artist " in line:
                 artist = line.split("xesam:artist")[1]
                 artist = artist.strip().replace(".", "").replace(",", "")
+                artist = str(artist.encode("ascii", "ignore").decode())
                 if len(artist) > title_max_length:
                     artist = artist[0:title_max_length]
         if to_read_flag is True:
