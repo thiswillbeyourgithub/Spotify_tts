@@ -130,4 +130,5 @@ while True:
             write("output.wav", data=wav, rate=rate)
             play_pause("pause")
             playsound("output.wav")
+            Path("output.wav").unlink()
         play_pause("play")
