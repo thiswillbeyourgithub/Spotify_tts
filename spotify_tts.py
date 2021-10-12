@@ -36,14 +36,15 @@ for p in process_list:
         cnt += 1
         if "tts" in p and "python" in p and "nvim" not in p:
             dcnt += 1
-if dcnt == 1:
-    print("Only 1 daemon found, so it's me, running.")
 if dcnt > 1:
         print("Daemon already running. Exiting.")
         raise SystemExit()
 if cnt-dcnt == 0:
     print("Spotify is not running. Exiting.")
     raise SystemExit()
+if dcnt == 1:
+    # Only 1 daemon found, so it's me, running
+    pass
 
 if startup_read is True:
     os.system(f"{espeak_cmd} 'Starting TTS'")
@@ -116,19 +117,20 @@ while True:
             continue
 
         previous_title = title
-        artist = run_shell_cmd("playerctl --player spotify metadata xesam:artist")
         title = process_text(title)
+        artist = run_shell_cmd("playerctl --player spotify metadata xesam:artist")
         artist = process_text(artist)
 
         print(f"Playing: {title}, by {artist}.")
         if High_quality_speech is False:
             play_pause("pause")
-            os.system(f"{espeak_cmd} '{title}, by {artist}.'")
+            os.system(f"{espeak_cmd} '{title} ; by {artist}.'")
+            play_pause("play")
         else:
             out = model.predict(f"{title}, by {artist}.")
             wav = audio.reconstruct_waveform(out['mel'].numpy().T)
             write("output.wav", data=wav, rate=rate)
             play_pause("pause")
             playsound("output.wav")
+            play_pause("play")
             Path("output.wav").unlink()
-        play_pause("play")
