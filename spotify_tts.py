@@ -149,7 +149,7 @@ while True:
                 play_pause("pause")
                 playsound("output.wav")
                 play_pause("play")
-            #    Path("output.wav").unlink()
+                Path("output.wav").unlink()
     except Exception as e:
         print(f"EXCEPTION: {e}")
         err_cnt += 1
