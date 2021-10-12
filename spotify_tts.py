@@ -9,16 +9,23 @@ from pathlib import Path
 
 # USER SETTINGS: ###############################
 High_quality_speech = True  # True for AI powered TTS, False to use espeak
-rate = 22000  # default to 22000, changes the playback speed
+rate = 23000  # default to 22000, changes the playback speed
 step = 60000  # step of the model used, changing the value requires downloading
 # a different model each time, default is 95000
 title_max_length = 50
 espeak_cmd = f"espeak -v en -a85 -k20 -p60 -s150 --punct=''"
+fade_or_pause = "fade" # if fade, will change volume while speaking
+# if pause, will pause music while speaking
+fade_level = 1.5 # divide the volume by 1.5 when speaking
 ##################################################
 
 
 # this loop makes sure not to load the AI libraries if spotify is not running
-process_list = [" ".join(x.as_dict()["cmdline"]) for x in psutil.process_iter()]
+try:
+    process_list = [" ".join(x.as_dict()["cmdline"]) for x in psutil.process_iter()]
+except FileNotFoundError as e:
+    print(f"Retrying because FileNotFoundError: {e}")
+    process_list = [" ".join(x.as_dict()["cmdline"]) for x in psutil.process_iter()]
 cnt = 0
 dcnt = 0
 for p in process_list:
