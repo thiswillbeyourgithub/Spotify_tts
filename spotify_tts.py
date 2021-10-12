@@ -113,29 +113,36 @@ print("\n\nReady.")
 previous_title = ""
 err_cnt = 0
 while True:
-    is_playing = run_shell_cmd("playerctl --player spotify status")
-    if "Playing" in is_playing:
-        title = run_shell_cmd("playerctl --player spotify metadata xesam:title")
-        if title == previous_title:
-            time.sleep(1)
-            continue
+    try:
+        is_playing = run_shell_cmd("playerctl --player spotify status")
+        if "Playing" in is_playing:
+            title = run_shell_cmd("playerctl --player spotify metadata xesam:title")
+            if title == previous_title:
+                time.sleep(1)
+                continue
 
-        previous_title = title
-        title = process_text(title)
-        artist = run_shell_cmd("playerctl --player spotify metadata xesam:artist")
-        artist = process_text(artist)
+            previous_title = title
+            title = process_text(title)
+            artist = run_shell_cmd("playerctl --player spotify metadata xesam:artist")
+            artist = process_text(artist)
 
-        print(f"Playing: {title}, by {artist}.")
-        if High_quality_speech is False:
-            play_pause("pause")
-            os.system(f"{espeak_cmd} '{title} ; by {artist}.'")
-            play_pause("play")
-        else:
-            out = model.predict(f"{title}, by {artist}.")
-            wav = audio.reconstruct_waveform(out['mel'].numpy().T)
-            os.chdir("../Spotify_tts/")
-            write("output.wav", data=wav, rate=rate)
-            play_pause("pause")
-            playsound("output.wav")
-            play_pause("play")
-            Path("output.wav").unlink()
+            print(f"Playing: {title}, by {artist}.")
+            if High_quality_speech is False:
+                play_pause("pause")
+                os.system(f"{espeak_cmd} '{title} ; by {artist}.'")
+                play_pause("play")
+            else:
+                out = model.predict(f"{title}, by {artist}.")
+                wav = audio.reconstruct_waveform(out['mel'].numpy().T)
+                os.chdir("../Spotify_tts/")
+                write("output.wav", data=wav, rate=rate)
+                play_pause("pause")
+                playsound("output.wav")
+                play_pause("play")
+            #    Path("output.wav").unlink()
+    except Exception as e:
+        print(f"EXCEPTION: {e}")
+        err_cnt += 1
+        if err_cnt > 10:
+            print("Too many errors, exiting.")
+            raise SystemExit()
