@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+import re
 import subprocess
 import time
 import os
 import sys
 import psutil
+import unidecode
+import unicodedata
 from pathlib import Path
+from gensim.utils import deaccent
 
 # USER SETTINGS: ###############################
 High_quality_speech = True  # True for AI powered TTS, False to use espeak
@@ -84,7 +88,16 @@ def process_text(text):
     text = text.strip().replace(".", "").replace(",", "").replace("-", ",")
     text = text.replace(" , ", ", ")
     text = text[0:read_max_length]
-    text = str(text.encode("ascii", "ignore").decode())
+
+    try:
+        text = unicode(text, 'utf-8')
+    except (TypeError, NameError): # unicode is a default on python 3 
+        pass
+    text = unicodedata.normalize('NFD', text)
+    text = text.encode('ascii', 'ignore').decode("utf-8")
+    text = deaccent(text)
+    text = unidecode.unidecode(text)
+    text = re.sub(r"\\x..", "", text)
     if "featuring" not in text:
         text = text.replace("feat", "featuring")
     return text
