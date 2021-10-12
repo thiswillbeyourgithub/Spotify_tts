@@ -58,6 +58,31 @@ def run_shell_cmd(cmd):
     out = subprocess.run(splitted, capture_output=True)
     return str(out.stdout)
 
+def play_pause(order):
+    """
+    either pauses the music while speaking or just
+    lowers the volume
+    """
+    if fade_or_pause == "pause":
+        run_shell_cmd("playerctl --player spotify pause")
+    else:
+        os.chdir("../Spotify_tts/")
+        if order == "play":
+            os.system(f'./volume_fader.sh "*" "{fade_level}"')
+        else:
+            os.system(f'./volume_fader.sh "/" "{fade_level}"')
+
+def process_text(text):
+    """
+    makes the title and artist more legible
+    """
+    text = text.replace("b'", "").replace(r"\n'", "")
+    text = text.strip().replace(".", "").replace(",", "").replace("-", ",")
+    text = text[0:read_max_length]
+    text = str(text.encode("ascii", "ignore").decode())
+    if "featuring" not in text:
+        text = text.replace("feat", "featuring")
+    return text
 
 # Load AI libs if needed: ######################
 if High_quality_speech is True:
@@ -76,64 +101,33 @@ if High_quality_speech is True:
     model = tts_ljspeech(step)
     audio = Audio.from_config(model.config)
 
-# initialize some values:
-to_read_flag = False
-previous_song = ""
-
-def play_pause(order):
-    if fade_or_pause == "pause":
-        run_shell_cmd("playerctl --player spotify pause")
-    else:
-        if order == "play":
-            os.system(f'./volume_fader.sh "*" "{fade_level}"')
-        else:
-            os.system(f'./volume_fader.sh "/" "{fade_level}"')
 
 
 
-print("\n\nDone initializing stuff.")
-if fade_or_pause == "fade":
-    os.chdir("../Spotify_tts/")
+# Main loop: ###################################
+print("\n\nReady.")
+previous_title = ""
 while True:
     is_playing = run_shell_cmd("playerctl --player spotify status")
     if "Playing" in is_playing:
-        current_metadata = run_shell_cmd("playerctl --player spotify metadata")
-        current_metadata = current_metadata.split("\\n")
-        title = ""
-        artist = ""
-        for line in current_metadata:
-            if artist != "" and title != "":
-                break
-            if "xesam:title " in line:
-                title = line.split("xesam:title")[1]
-                title = title.strip().replace(".", "").replace(",", "").replace("-", ",")
-                title = title[0:title_max_length]
-                title = str(title.encode("ascii", "ignore").decode())
-                if "featuring" not in title:
-                    title = title.replace("feat", "featuring")
+        title = run_shell_cmd("playerctl --player spotify metadata xesam:title")
+        if title == previous_title:
+            time.sleep(1)
+            continue
 
-                if title == previous_song:
-                    to_read_flag = False
-                else:
-                    to_read_flag = True
-            if "xesam:artist " in line:
-                artist = line.split("xesam:artist")[1]
-                artist = artist.strip().replace(".", "").replace(",", "")
-                artist = str(artist.encode("ascii", "ignore").decode())
-                if len(artist) > title_max_length:
-                    artist = artist[0:title_max_length]
-        if to_read_flag is True:
-            print(f"Playing: {title}, by {artist}.")
-            if High_quality_speech is False:
-                play_pause("pause")
-                os.system(f"{espeak_cmd} '{title}, by {artist}.'")
-            else:
-                out = model.predict(f"{title}, by {artist}.")
-                wav = audio.reconstruct_waveform(out['mel'].numpy().T)
-                write("output.wav", data=wav, rate=rate)
-                play_pause("pause")
-                playsound("output.wav")
-            play_pause("play")
+        previous_title = title
+        artist = run_shell_cmd("playerctl --player spotify metadata xesam:artist")
+        title = process_text(title)
+        artist = process_text(artist)
 
-        previous_song = title
-    time.sleep(1)
+        print(f"Playing: {title}, by {artist}.")
+        if High_quality_speech is False:
+            play_pause("pause")
+            os.system(f"{espeak_cmd} '{title}, by {artist}.'")
+        else:
+            out = model.predict(f"{title}, by {artist}.")
+            wav = audio.reconstruct_waveform(out['mel'].numpy().T)
+            write("output.wav", data=wav, rate=rate)
+            play_pause("pause")
+            playsound("output.wav")
+        play_pause("play")
