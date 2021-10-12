@@ -17,6 +17,7 @@ espeak_cmd = f"espeak -v en -a85 -k20 -p60 -s150 --punct=''"
 fade_or_pause = "fade" # if fade, will change volume while speaking
                        # if pause, will pause music while speaking
 fade_level = 2 # divide the volume by 1.5 when speaking
+startup_read = True # speaks aloud to tell the user that it is running
 ##################################################
 
 
@@ -42,9 +43,10 @@ if dcnt > 1:
         raise SystemExit()
 if cnt-dcnt == 0:
     print("Spotify is not running. Exiting.")
-    #os.system(f"{espeak_cmd} 'Spotify is not running'")
     raise SystemExit()
 
+if startup_read is True:
+    os.system(f"{espeak_cmd} 'Starting TTS'")
 
 
 # Def util func: ###############################
@@ -56,7 +58,6 @@ def run_shell_cmd(cmd):
     out = subprocess.run(splitted, capture_output=True)
     return str(out.stdout)
 
-os.system(f"{espeak_cmd} 'Starting TTS'")
 
 if High_quality_speech is True:
     if not Path("../TransformerTTS").exists():
