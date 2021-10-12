@@ -59,6 +59,7 @@ def run_shell_cmd(cmd):
     return str(out.stdout)
 
 
+# Load AI libs if needed: ######################
 if High_quality_speech is True:
     if not Path("../TransformerTTS").exists():
         print("TransformerTTS not found, downloading it using git:\n\n")
