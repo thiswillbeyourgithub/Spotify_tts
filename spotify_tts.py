@@ -71,11 +71,20 @@ if High_quality_speech is True:
 to_read_flag = False
 previous_song = ""
 
-
+def play_pause(order):
+    if fade_or_pause == "pause":
+        run_shell_cmd("playerctl --player spotify pause")
+    else:
+        if order == "play":
+            os.system(f'./volume_fader.sh "*" "{fade_level}"')
+        else:
+            os.system(f'./volume_fader.sh "/" "{fade_level}"')
 
 
 
 print("\n\nDone initializing stuff.")
+if fade_or_pause == "fade":
+    os.chdir("../Spotify_tts/")
 while True:
     is_playing = run_shell_cmd("playerctl --player spotify status")
     if "Playing" in is_playing:
@@ -106,18 +115,16 @@ while True:
                     artist = artist[0:title_max_length]
         if to_read_flag is True:
             print(f"Playing: {title}, by {artist}.")
-            run_shell_cmd("playerctl --player spotify pause")
-
             if High_quality_speech is False:
+                play_pause("pause")
                 os.system(f"{espeak_cmd} '{title}, by {artist}.'")
             else:
                 out = model.predict(f"{title}, by {artist}.")
                 wav = audio.reconstruct_waveform(out['mel'].numpy().T)
                 write("output.wav", data=wav, rate=rate)
-                time.sleep(0.1)
+                play_pause("pause")
                 playsound("output.wav")
-                time.sleep(0.1)
+            play_pause("play")
 
-            run_shell_cmd("playerctl --player spotify play")
         previous_song = title
     time.sleep(1)
