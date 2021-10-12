@@ -18,6 +18,7 @@ fade_or_pause = "fade" # if fade, will change volume while speaking
                        # if pause, will pause music while speaking
 fade_level = 2 # divide the volume by 1.5 when speaking
 startup_read = True # speaks aloud to tell the user that it is running
+tts_dir = "/".join(os.getcwd().split("/")[0:-1]) + "/TransformerTTS"  # don't touch this
 ##################################################
 
 
@@ -94,7 +95,6 @@ if High_quality_speech is True:
         print("TransformerTTS not found, downloading it using git:\n\n")
         os.chdir("..")
         os.system("git clone https://github.com/as-ideas/TransformerTTS")
-    tts_dir = "/".join(os.getcwd().split("/")[0:-1]) + "/TransformerTTS"
     os.chdir(tts_dir)
     sys.path.insert(0, tts_dir)
     print(f"Temporarily added folder {tts_dir} to path.")
@@ -111,6 +111,7 @@ if High_quality_speech is True:
 # Main loop: ###################################
 print("\n\nReady.")
 previous_title = ""
+err_cnt = 0
 while True:
     is_playing = run_shell_cmd("playerctl --player spotify status")
     if "Playing" in is_playing:
@@ -132,6 +133,7 @@ while True:
         else:
             out = model.predict(f"{title}, by {artist}.")
             wav = audio.reconstruct_waveform(out['mel'].numpy().T)
+            os.chdir("../Spotify_tts/")
             write("output.wav", data=wav, rate=rate)
             play_pause("pause")
             playsound("output.wav")
