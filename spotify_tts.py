@@ -153,6 +153,7 @@ while True:
     except Exception as e:
         print(f"EXCEPTION: {e}")
         err_cnt += 1
-        if err_cnt > 10:
+        if err_cnt > 3:
             print("Too many errors, exiting.")
             raise SystemExit()
+            time.sleep(1)
