@@ -21,7 +21,7 @@ espeak_cmd = f"espeak -v en -a85 -k20 -p60 -s150 --punct=''"
 fade_or_pause = "fade" # if fade, will change volume while speaking
                        # if pause, will pause music while speaking
 fade_level = 2 # divide the volume by 1.5 when speaking
-startup_read = True # speaks aloud to tell the user that it is running
+startup_read = False # speaks aloud to tell the user that it is running
 tts_dir = "/".join(os.getcwd().split("/")[0:-1]) + "/TransformerTTS"  # don't touch this
 ##################################################
 
@@ -53,6 +53,8 @@ if dcnt == 1:
 
 if startup_read is True:
     os.system(f"{espeak_cmd} 'Starting TTS'")
+else:
+    print("Starting without speaking.")
 
 
 # Def util func: ###############################
