@@ -110,7 +110,6 @@ if High_quality_speech is True:
         os.system("git clone https://github.com/as-ideas/TransformerTTS")
     os.chdir(tts_dir)
     sys.path.insert(0, tts_dir)
-    print(f"Temporarily added folder {tts_dir} to path.")
     from data.audio import Audio
     from model.factory import tts_ljspeech
     from scipy.io.wavfile import write
