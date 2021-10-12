@@ -72,7 +72,6 @@ def play_pause(order):
     if fade_or_pause == "pause":
         run_shell_cmd("playerctl --player spotify pause")
     else:
-        os.chdir("../Spotify_tts/")
         if order == "play":
             os.system(f'./volume_fader.sh "*" "{fade_level}"')
         else:
@@ -108,7 +107,7 @@ if High_quality_speech is True:
         print("TransformerTTS not found, downloading it using git:\n\n")
         os.chdir("..")
         os.system("git clone https://github.com/as-ideas/TransformerTTS")
-    os.chdir(tts_dir)
+        os.chdir("Spotify_tts/")
     sys.path.insert(0, tts_dir)
     from data.audio import Audio
     from model.factory import tts_ljspeech
@@ -146,7 +145,6 @@ while True:
             else:
                 out = model.predict(f"{title}, by {artist}.")
                 wav = audio.reconstruct_waveform(out['mel'].numpy().T)
-                os.chdir("../Spotify_tts/")
                 write("output.wav", data=wav, rate=rate)
                 play_pause("pause")
                 playsound("output.wav")
